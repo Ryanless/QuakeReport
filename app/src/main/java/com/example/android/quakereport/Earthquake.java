@@ -10,44 +10,45 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Michail on 15.01.2018.
  */
 
 public class Earthquake {
-    private float magnitude;
-    private String place;
-    private int timeUnixStamp;
+    private float mMagnitude;
+    private String mPlace;
+    private int mTimeUnixStamp;
 
 
     public Earthquake(float magnitude, String place, int timeUnixStamp) {
-        this.magnitude = magnitude;
-        this.place = place;
-        this.timeUnixStamp = timeUnixStamp;
+        this.mMagnitude = magnitude;
+        this.mPlace = place;
+        this.mTimeUnixStamp = timeUnixStamp;
     }
 
     public float getMagnitude() {
-        return magnitude;
+        return mMagnitude;
     }
 
     public String getPlace() {
-        return place;
+        return mPlace;
     }
 
     //who knows if I will ever use this method
     public int getTimeUnixStamp() {
-        return timeUnixStamp;
+        return mTimeUnixStamp;
     }
 
     public String getDate() {
-        return String.valueOf(timeUnixStamp);
+        return String.valueOf(mTimeUnixStamp);
     }
 
 
     /**
      * ArrayAdapter to display the Earthquake class in a ListView
+     * It's made a inner class instead of a separate class because it's only used
+     * together with the outer Earthquake class.
      */
     public static class EarthquakeArrayAdapter extends ArrayAdapter<Earthquake> {
 
