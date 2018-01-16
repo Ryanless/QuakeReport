@@ -7,7 +7,14 @@
 
     <TextView
         android:id="@+id/list_item_magnitude_tv"
-        style="@style/list_item_common_attributes"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:gravity="center"
+        android:background="@drawable/magnitude_circle"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:layout_marginRight="16dp"
         android:text="MAG" />
 
     <LinearLayout
