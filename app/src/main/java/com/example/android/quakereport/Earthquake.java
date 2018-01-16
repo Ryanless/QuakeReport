@@ -9,7 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Michail on 15.01.2018.
@@ -18,13 +20,18 @@ import java.util.ArrayList;
 public class Earthquake {
     private float mMagnitude;
     private String mPlace;
-    private int mTimeUnixStamp;
+    private long mTimeUnixStamp;
+    private Date mDate;
+
+    static SimpleDateFormat dateFormatter = new SimpleDateFormat("DD. MMM, yyyy");
+    static SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
 
 
-    public Earthquake(float magnitude, String place, int timeUnixStamp) {
+    public Earthquake(float magnitude, String place, long timeUnixStamp) {
         this.mMagnitude = magnitude;
         this.mPlace = place;
         this.mTimeUnixStamp = timeUnixStamp;
+        this.mDate = new Date(mTimeUnixStamp);
     }
 
     public float getMagnitude() {
@@ -36,12 +43,16 @@ public class Earthquake {
     }
 
     //who knows if I will ever use this method
-    public int getTimeUnixStamp() {
+    public long getTimeUnixStamp() {
         return mTimeUnixStamp;
     }
 
     public String getDate() {
-        return String.valueOf(mTimeUnixStamp);
+        return dateFormatter.format(mDate);
+    }
+
+    public String getTime() {
+        return timeFormatter.format(mDate);
     }
 
 
@@ -77,6 +88,9 @@ public class Earthquake {
 
             TextView dateTV = rootView.findViewById(R.id.list_item_date_tv);
             dateTV.setText(currentEarthquake.getDate());
+
+            TextView timeTV = rootView.findViewById(R.id.list_item_time_tv);
+            timeTV.setText(currentEarthquake.getTime());
 
 
 

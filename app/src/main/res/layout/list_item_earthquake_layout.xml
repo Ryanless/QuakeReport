@@ -20,6 +20,11 @@
         style="@style/list_item_common_attributes"
         android:text="some date"/>
 
+    <TextView
+        android:id="@+id/list_item_time_tv"
+        style="@style/list_item_common_attributes"
+        android:text="some time"/>
+
 
 
 </LinearLayout>
