@@ -1,7 +1,9 @@
 package com.example.android.quakereport;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -26,17 +28,19 @@ public class Earthquake {
     private String mPlace;
     private long mTimeUnixStamp;
     private Date mDate;
+    private String mPageUrl;
 
     static SimpleDateFormat sDateFormatter = new SimpleDateFormat("DD. MMM, yyyy");
     static SimpleDateFormat sTimeFormatter = new SimpleDateFormat("HH:mm");
     static DecimalFormat sMagnitudeFormatter = new DecimalFormat("0.0");
 
 
-    public Earthquake(float magnitude, String place, long timeUnixStamp) {
+    public Earthquake(float magnitude, String place, long timeUnixStamp, String pageUrl) {
         this.mMagnitude = magnitude;
         this.mPlace = place;
         this.mTimeUnixStamp = timeUnixStamp;
         this.mDate = new Date(mTimeUnixStamp);
+        this.mPageUrl = pageUrl;
     }
 
     public float getMagnitude() {
@@ -51,10 +55,6 @@ public class Earthquake {
         return mPlace;
     }
 
-    //who knows if I will ever use this method
-    public long getTimeUnixStamp() {
-        return mTimeUnixStamp;
-    }
 
     public String getDate() {
         return sDateFormatter.format(mDate);
@@ -64,8 +64,9 @@ public class Earthquake {
         return sTimeFormatter.format(mDate);
     }
 
-
-
+    public String getmPageUrl() {
+        return mPageUrl;
+    }
 
     /**
      * ArrayAdapter to display the Earthquake class in a ListView
@@ -89,7 +90,7 @@ public class Earthquake {
                 rootView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_earthquake_layout, parent, false);
             }
 
-            Earthquake currentEarthquake = getItem(position);
+            final Earthquake currentEarthquake = getItem(position);
 
             TextView magnitudeTV = rootView.findViewById(R.id.list_item_magnitude_tv);
             magnitudeTV.setText( currentEarthquake.getMagnitudeFormatted());
@@ -104,24 +105,42 @@ public class Earthquake {
             // Set the color on the magnitude circle
             magnitudeCircle.setColor(magnitudeColor);
 
+
             //preparation for setting the 2 places Strings
             String[] placeArray = buildPlaceStrings(currentEarthquake.getPlace());
-
+            //then setting both place strings
             TextView placeModTV = rootView.findViewById(R.id.list_item_place_modifier_tv);
             placeModTV.setText(placeArray[0]);
-
             TextView placeTV = rootView.findViewById(R.id.list_item_place_tv);
             placeTV.setText(placeArray[1]);
 
+            //setting both date & time strings
             TextView dateTV = rootView.findViewById(R.id.list_item_date_tv);
             dateTV.setText(currentEarthquake.getDate());
-
             TextView timeTV = rootView.findViewById(R.id.list_item_time_tv);
             timeTV.setText(currentEarthquake.getTime());
 
+            //sets up the onClickListener
+            //so that clicking on a earthquake brings up that homepage site
+            View listItem = rootView.findViewById(R.id.list_item_ll);
+            View.OnClickListener listener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openWebPage(currentEarthquake.getmPageUrl());
+                }
+            };
+            listItem.setOnClickListener(listener);
 
 
             return rootView;
+        }
+
+        public void openWebPage(String url) {
+            Uri webpage = Uri.parse(url);
+            Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+            if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+                getContext().startActivity(intent);
+            }
         }
 
         /**

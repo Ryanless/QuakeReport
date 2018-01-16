@@ -58,8 +58,8 @@ public final class QueryUtils {
                 float magnitude = (float) earthquakeJSON.getDouble("mag");
                 String place = earthquakeJSON.getString("place");
                 long unixTime = earthquakeJSON.getLong("time");
-
-                earthquakes.add(new Earthquake(magnitude,place,unixTime));
+                String pageUrl = earthquakeJSON.getString("url");
+                earthquakes.add(new Earthquake(magnitude,place,unixTime, pageUrl));
 
             }
 
