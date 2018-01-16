@@ -3,6 +3,7 @@ package com.example.android.quakereport;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +24,8 @@ public class Earthquake {
     private long mTimeUnixStamp;
     private Date mDate;
 
-    static SimpleDateFormat dateFormatter = new SimpleDateFormat("DD. MMM, yyyy");
-    static SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
+    static SimpleDateFormat sDateFormatter = new SimpleDateFormat("DD. MMM, yyyy");
+    static SimpleDateFormat sTimeFormatter = new SimpleDateFormat("HH:mm");
 
 
     public Earthquake(float magnitude, String place, long timeUnixStamp) {
@@ -48,11 +49,11 @@ public class Earthquake {
     }
 
     public String getDate() {
-        return dateFormatter.format(mDate);
+        return sDateFormatter.format(mDate);
     }
 
     public String getTime() {
-        return timeFormatter.format(mDate);
+        return sTimeFormatter.format(mDate);
     }
 
 
@@ -83,8 +84,13 @@ public class Earthquake {
             TextView magnitudeTV = rootView.findViewById(R.id.list_item_magnitude_tv);
             magnitudeTV.setText( String.valueOf(currentEarthquake.getMagnitude()));
 
+            String[] placeArray = buildPlaceStrings(currentEarthquake.getPlace());
+
+            TextView placeModTV = rootView.findViewById(R.id.list_item_place_modifier_tv);
+            placeModTV.setText(placeArray[0]);
+
             TextView placeTV = rootView.findViewById(R.id.list_item_place_tv);
-            placeTV.setText( currentEarthquake.getPlace());
+            placeTV.setText(placeArray[1]);
 
             TextView dateTV = rootView.findViewById(R.id.list_item_date_tv);
             dateTV.setText(currentEarthquake.getDate());
@@ -96,7 +102,31 @@ public class Earthquake {
 
             return rootView;
         }
+
+        /**
+         * sets the mPlaceArray this way ["82km N of", "Tokyo, Japan" ]
+         *
+         * @return
+         */
+        String[] buildPlaceStrings(String placeString){
+            String [] placeArray = new String[2];
+
+            int index = placeString.indexOf(" of ");
+
+            if (index == -1){
+                placeArray[0] = getContext().getString( R.string.near_the);
+                placeArray[1] = placeString;
+            }
+            else {
+                placeArray[0] = placeString.substring(0, index + 3);
+                placeArray[1] = placeString.substring(index + 4, placeString.length());
+            }
+
+            return  placeArray;
+        }
     }
+
+
 
 
 }
