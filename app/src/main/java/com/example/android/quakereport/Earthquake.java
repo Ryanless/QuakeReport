@@ -64,7 +64,7 @@ public class Earthquake {
         return sTimeFormatter.format(mDate);
     }
 
-    public String getmPageUrl() {
+    public String getPageUrl() {
         return mPageUrl;
     }
 
@@ -120,28 +120,9 @@ public class Earthquake {
             TextView timeTV = rootView.findViewById(R.id.list_item_time_tv);
             timeTV.setText(currentEarthquake.getTime());
 
-            //sets up the onClickListener
-            //so that clicking on a earthquake brings up that homepage site
-            View listItem = rootView.findViewById(R.id.list_item_ll);
-            View.OnClickListener listener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    openWebPage(currentEarthquake.getmPageUrl());
-                }
-            };
-            listItem.setOnClickListener(listener);
-
-
             return rootView;
         }
 
-        public void openWebPage(String url) {
-            Uri webpage = Uri.parse(url);
-            Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
-            if (intent.resolveActivity(getContext().getPackageManager()) != null) {
-                getContext().startActivity(intent);
-            }
-        }
 
         /**
          * sets the mPlaceArray this way ["82km N of", "Tokyo, Japan" ]
