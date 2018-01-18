@@ -17,29 +17,40 @@ package com.example.android.quakereport;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class EarthquakeActivity extends AppCompatActivity {
 
     public static final String LOG_TAG = EarthquakeActivity.class.getName();
+    final String QUERY_URL_STRING = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=6&limit=10";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
 
+        QuakeAsyncTask task = new QuakeAsyncTask();
+        task.execute(QUERY_URL_STRING);
+
+
+
         // Create a fake list of earthquakes.
-        final ArrayList<Earthquake> earthquakes = QueryUtils.extractEarthquakes();
+        final ArrayList<Earthquake> earthquakes = QueryUtils.extractEarthquakes(QueryUtils.SAMPLE_JSON_RESPONSE);
 
         // Find a reference to the {@link ListView} in the layout
-        final ListView earthquakeListView = (ListView) findViewById(R.id.list);
+        final ListView earthquakeListView = findViewById(R.id.list);
 
         // Create a new {@link ArrayAdapter} of earthquakes
         Earthquake.EarthquakeArrayAdapter adapter = new Earthquake.EarthquakeArrayAdapter(
@@ -64,6 +75,37 @@ public class EarthquakeActivity extends AppCompatActivity {
         Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
+        }
+    }
+
+    private class QuakeAsyncTask extends AsyncTask<String,Void,ArrayList<Earthquake>> {
+
+        @Override
+        protected ArrayList<Earthquake> doInBackground(String... strings) {
+            if (strings == null || strings.length == 0 || TextUtils.isEmpty(strings[0])){
+                Log.e(LOG_TAG, "AsyncTask got an invalid input: " +strings.toString());
+                return null;
+            }
+            URL requestUrl = QueryUtils.createUrl(strings[0]);
+
+            Log.d(LOG_TAG, "backgroundTask finished");
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Earthquake> earthquakes) {
+
+            //TODO: make it update UI
+            //logs the result in the log
+            if (earthquakes == null || earthquakes.size() == 0){
+                Log.d(LOG_TAG, "asyncTask returned empty array");
+            }
+            else {
+                for (int i = 0; i < earthquakes.size(); i++){
+                    Log.d(LOG_TAG, earthquakes.get(i).toString());
+                }
+            }
+
         }
     }
 

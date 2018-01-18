@@ -68,6 +68,16 @@ public class Earthquake {
         return mPageUrl;
     }
 
+    @Override
+    public String toString() {
+        String message = "Earthquake: ";
+        message += "mag: " + mMagnitude;
+        message += " place: " + mPlace;
+        message += " date: " + getDate();
+
+        return message;
+    }
+
     /**
      * ArrayAdapter to display the Earthquake class in a ListView
      * It's made a inner class instead of a separate class because it's only used
