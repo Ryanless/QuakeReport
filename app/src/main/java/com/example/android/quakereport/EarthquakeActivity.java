@@ -28,6 +28,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.net.URL;
@@ -40,6 +41,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
     final String QUERY_URL_STRING = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=5&limit=10";
 
     ListView mEarthquakeListView;
+    TextView mEmptyView;
     Earthquake.EarthquakeArrayAdapter mAdapter;
 
     @Override
@@ -49,6 +51,10 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
 
         // Find a reference to the {@link ListView} in the layout
         mEarthquakeListView = findViewById(R.id.list);
+        mEmptyView = findViewById(R.id.empty_tv);
+
+
+        mEarthquakeListView.setEmptyView(mEmptyView);
 
         // Create a new {@link ArrayAdapter} of earthquakes
         mAdapter = new Earthquake.EarthquakeArrayAdapter(
@@ -94,6 +100,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
     @Override
     public void onLoadFinished(Loader<ArrayList<Earthquake>> loader, ArrayList<Earthquake> data) {
         updateUI(data);
+        mEmptyView.setText(getString(R.string.no_quakes_found));
 
     }
 
