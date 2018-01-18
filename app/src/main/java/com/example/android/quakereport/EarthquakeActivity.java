@@ -28,6 +28,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -42,6 +43,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
 
     ListView mEarthquakeListView;
     TextView mEmptyView;
+    ProgressBar mProgressBar;
     Earthquake.EarthquakeArrayAdapter mAdapter;
 
     @Override
@@ -52,6 +54,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
         // Find a reference to the {@link ListView} in the layout
         mEarthquakeListView = findViewById(R.id.list);
         mEmptyView = findViewById(R.id.empty_tv);
+        mProgressBar = findViewById(R.id.loading_bar);
 
 
         mEarthquakeListView.setEmptyView(mEmptyView);
@@ -72,7 +75,6 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
 
         mAdapter.clear();
         mAdapter.addAll(quakeArray);
-
 
         mEarthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -101,13 +103,13 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
     public void onLoadFinished(Loader<ArrayList<Earthquake>> loader, ArrayList<Earthquake> data) {
         updateUI(data);
         mEmptyView.setText(getString(R.string.no_quakes_found));
+        mProgressBar.setVisibility(View.GONE);
 
     }
 
     @Override
     public void onLoaderReset(Loader<ArrayList<Earthquake>> loader) {
         loader.reset();
-
     }
 
 
