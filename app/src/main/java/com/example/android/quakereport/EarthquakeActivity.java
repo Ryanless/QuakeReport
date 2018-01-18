@@ -36,7 +36,7 @@ public class EarthquakeActivity extends AppCompatActivity {
     final String QUERY_URL_STRING = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=6&limit=10";
 
     ListView mEarthquakeListView;
-    Earthquake.EarthquakeArrayAdapter adapter;
+    Earthquake.EarthquakeArrayAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +46,6 @@ public class EarthquakeActivity extends AppCompatActivity {
         // Find a reference to the {@link ListView} in the layout
         mEarthquakeListView = findViewById(R.id.list);
 
-        //TODO: delete this fake display
-//        // Create and display a fake list of earthquakes.
-//        final ArrayList<Earthquake> earthquakes = QueryUtils.extractEarthquakes(QueryUtils.SAMPLE_JSON_RESPONSE);
-//        updateUI(earthquakes);
-
         //Fetch the data from the URL and display it
         QuakeAsyncTask task = new QuakeAsyncTask();
         task.execute(QUERY_URL_STRING);
@@ -59,12 +54,12 @@ public class EarthquakeActivity extends AppCompatActivity {
 
     public void updateUI(final ArrayList<Earthquake> quakeArray) {
         // Create a new {@link ArrayAdapter} of earthquakes
-        adapter = new Earthquake.EarthquakeArrayAdapter(
+        mAdapter = new Earthquake.EarthquakeArrayAdapter(
                 this, quakeArray);
 
         // Set the adapter on the {@link ListView}
         // so the list can be populated in the user interface
-        mEarthquakeListView.setAdapter(adapter);
+        mEarthquakeListView.setAdapter(mAdapter);
 
         mEarthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -73,8 +68,6 @@ public class EarthquakeActivity extends AppCompatActivity {
             }
         });
     }
-
-
 
 
     public void openWebPage(String url) {
@@ -93,24 +86,13 @@ public class EarthquakeActivity extends AppCompatActivity {
                 Log.e(LOG_TAG, "AsyncTask got an invalid input: " +strings.toString());
                 return null;
             }
-            URL requestUrl = QueryUtils.createUrl(strings[0]);
-            String response;
-            ArrayList<Earthquake> quakesArray = null;
-            try {
-                response = QueryUtils.makeHTTPRequest(requestUrl);
-                quakesArray = QueryUtils.extractEarthquakes(response);
-            }
-            catch (IOException e) {
-                Log.e(LOG_TAG, "IOException thrown: ");
-                e.printStackTrace();
-            }
-            return quakesArray;
+
+            return QueryUtils.fetchEarthquakeData(strings[0]);
         }
 
         @Override
         protected void onPostExecute(ArrayList<Earthquake> earthquakes) {
 
-            //logs the result in the log
             if (earthquakes == null || earthquakes.size() == 0){
                 Log.e(LOG_TAG, "asyncTask returned empty array");
                 return;
