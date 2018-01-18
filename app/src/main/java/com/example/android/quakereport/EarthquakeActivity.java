@@ -36,6 +36,7 @@ import java.util.ArrayList;
 public class EarthquakeActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ArrayList<Earthquake>> {
 
     public static final String LOG_TAG = EarthquakeActivity.class.getName();
+    private static final int EARTHQUAKE_LOADER_ID = 1;
     final String QUERY_URL_STRING = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=5&limit=10";
 
     ListView mEarthquakeListView;
@@ -49,18 +50,23 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
         // Find a reference to the {@link ListView} in the layout
         mEarthquakeListView = findViewById(R.id.list);
 
-        getLoaderManager().initLoader(1,null,this);
-
-    }
-
-    public void updateUI(final ArrayList<Earthquake> quakeArray) {
         // Create a new {@link ArrayAdapter} of earthquakes
         mAdapter = new Earthquake.EarthquakeArrayAdapter(
-                this, quakeArray);
+                this, new ArrayList<Earthquake>());
 
         // Set the adapter on the {@link ListView}
         // so the list can be populated in the user interface
         mEarthquakeListView.setAdapter(mAdapter);
+
+        getLoaderManager().initLoader(EARTHQUAKE_LOADER_ID,null,this);
+
+    }
+
+    public void updateUI(final ArrayList<Earthquake> quakeArray) {
+
+        mAdapter.clear();
+        mAdapter.addAll(quakeArray);
+
 
         mEarthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
