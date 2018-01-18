@@ -87,9 +87,17 @@ public class EarthquakeActivity extends AppCompatActivity {
                 return null;
             }
             URL requestUrl = QueryUtils.createUrl(strings[0]);
-
-            Log.d(LOG_TAG, "backgroundTask finished");
-            return null;
+            String response = "";
+            ArrayList<Earthquake> quakesArray = null;
+            try {
+                response = QueryUtils.makeHTTPRequest(requestUrl);
+                quakesArray = QueryUtils.extractEarthquakes(response);
+            }
+            catch (IOException e) {
+                Log.e(LOG_TAG, "IOException thrown: ");
+                e.printStackTrace();
+            }
+            return quakesArray;
         }
 
         @Override
@@ -101,6 +109,7 @@ public class EarthquakeActivity extends AppCompatActivity {
                 Log.d(LOG_TAG, "asyncTask returned empty array");
             }
             else {
+                Log.e(LOG_TAG, "the http request returned: " + earthquakes.size() + " earthquakes");
                 for (int i = 0; i < earthquakes.size(); i++){
                     Log.d(LOG_TAG, earthquakes.get(i).toString());
                 }
