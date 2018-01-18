@@ -17,8 +17,11 @@ package com.example.android.quakereport;
 
 import android.app.LoaderManager;
 import android.content.AsyncTaskLoader;
+import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -45,19 +48,21 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
     TextView mEmptyView;
     ProgressBar mProgressBar;
     Earthquake.EarthquakeArrayAdapter mAdapter;
+    ConnectivityManager mConnectivityManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
 
-        // Find a reference to the {@link ListView} in the layout
+        // Find a reference to the Views in the layout
         mEarthquakeListView = findViewById(R.id.list);
         mEmptyView = findViewById(R.id.empty_tv);
         mProgressBar = findViewById(R.id.loading_bar);
-
-
         mEarthquakeListView.setEmptyView(mEmptyView);
+
+        //mConnectivityManager is needed to check if there is an internet connection
+        mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
         // Create a new {@link ArrayAdapter} of earthquakes
         mAdapter = new Earthquake.EarthquakeArrayAdapter(
@@ -67,7 +72,26 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
         // so the list can be populated in the user interface
         mEarthquakeListView.setAdapter(mAdapter);
 
-        getLoaderManager().initLoader(EARTHQUAKE_LOADER_ID,null,this);
+        if(hasInternetConnection()){
+            getLoaderManager().initLoader(EARTHQUAKE_LOADER_ID,null,this);
+        }
+        else {
+            showNoInternet();
+        }
+
+
+    }
+
+    private boolean hasInternetConnection(){
+        NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
+
+
+    private void showNoInternet() {
+        mProgressBar.setVisibility(View.GONE);
+        mEmptyView.setText(getString(R.string.no_internet));
 
     }
 
