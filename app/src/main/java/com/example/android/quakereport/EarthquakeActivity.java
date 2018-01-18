@@ -24,7 +24,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.io.IOException;
@@ -36,38 +35,46 @@ public class EarthquakeActivity extends AppCompatActivity {
     public static final String LOG_TAG = EarthquakeActivity.class.getName();
     final String QUERY_URL_STRING = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=6&limit=10";
 
+    ListView mEarthquakeListView;
+    Earthquake.EarthquakeArrayAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
 
+        // Find a reference to the {@link ListView} in the layout
+        mEarthquakeListView = findViewById(R.id.list);
+
+        //TODO: delete this fake display
+//        // Create and display a fake list of earthquakes.
+//        final ArrayList<Earthquake> earthquakes = QueryUtils.extractEarthquakes(QueryUtils.SAMPLE_JSON_RESPONSE);
+//        updateUI(earthquakes);
+
+        //Fetch the data from the URL and display it
         QuakeAsyncTask task = new QuakeAsyncTask();
         task.execute(QUERY_URL_STRING);
 
+    }
 
-
-        // Create a fake list of earthquakes.
-        final ArrayList<Earthquake> earthquakes = QueryUtils.extractEarthquakes(QueryUtils.SAMPLE_JSON_RESPONSE);
-
-        // Find a reference to the {@link ListView} in the layout
-        final ListView earthquakeListView = findViewById(R.id.list);
-
+    public void updateUI(final ArrayList<Earthquake> quakeArray) {
         // Create a new {@link ArrayAdapter} of earthquakes
-        Earthquake.EarthquakeArrayAdapter adapter = new Earthquake.EarthquakeArrayAdapter(
-                this, earthquakes);
+        adapter = new Earthquake.EarthquakeArrayAdapter(
+                this, quakeArray);
 
         // Set the adapter on the {@link ListView}
         // so the list can be populated in the user interface
-        earthquakeListView.setAdapter(adapter);
+        mEarthquakeListView.setAdapter(adapter);
 
-
-        earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mEarthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                openWebPage(earthquakes.get(position).getPageUrl());
+                openWebPage(quakeArray.get(position).getPageUrl());
             }
         });
     }
+
+
 
 
     public void openWebPage(String url) {
@@ -87,7 +94,7 @@ public class EarthquakeActivity extends AppCompatActivity {
                 return null;
             }
             URL requestUrl = QueryUtils.createUrl(strings[0]);
-            String response = "";
+            String response;
             ArrayList<Earthquake> quakesArray = null;
             try {
                 response = QueryUtils.makeHTTPRequest(requestUrl);
@@ -103,17 +110,14 @@ public class EarthquakeActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<Earthquake> earthquakes) {
 
-            //TODO: make it update UI
             //logs the result in the log
             if (earthquakes == null || earthquakes.size() == 0){
-                Log.d(LOG_TAG, "asyncTask returned empty array");
+                Log.e(LOG_TAG, "asyncTask returned empty array");
+                return;
             }
-            else {
-                Log.e(LOG_TAG, "the http request returned: " + earthquakes.size() + " earthquakes");
-                for (int i = 0; i < earthquakes.size(); i++){
-                    Log.d(LOG_TAG, earthquakes.get(i).toString());
-                }
-            }
+
+            Log.d(LOG_TAG, "the http request returned: " + earthquakes.size() + " earthquakes");
+            updateUI(earthquakes);
 
         }
     }
