@@ -15,7 +15,10 @@
  */
 package com.example.android.quakereport;
 
+import android.app.LoaderManager;
+import android.content.AsyncTaskLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -30,10 +33,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class EarthquakeActivity extends AppCompatActivity {
+public class EarthquakeActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ArrayList<Earthquake>> {
 
     public static final String LOG_TAG = EarthquakeActivity.class.getName();
-    final String QUERY_URL_STRING = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=6&limit=10";
+    final String QUERY_URL_STRING = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=5&limit=10";
 
     ListView mEarthquakeListView;
     Earthquake.EarthquakeArrayAdapter mAdapter;
@@ -46,9 +49,7 @@ public class EarthquakeActivity extends AppCompatActivity {
         // Find a reference to the {@link ListView} in the layout
         mEarthquakeListView = findViewById(R.id.list);
 
-        //Fetch the data from the URL and display it
-        QuakeAsyncTask task = new QuakeAsyncTask();
-        task.execute(QUERY_URL_STRING);
+        getLoaderManager().initLoader(1,null,this);
 
     }
 
@@ -78,30 +79,23 @@ public class EarthquakeActivity extends AppCompatActivity {
         }
     }
 
-    private class QuakeAsyncTask extends AsyncTask<String,Void,ArrayList<Earthquake>> {
 
-        @Override
-        protected ArrayList<Earthquake> doInBackground(String... strings) {
-            if (strings == null || strings.length == 0 || TextUtils.isEmpty(strings[0])){
-                Log.e(LOG_TAG, "AsyncTask got an invalid input: " +strings.toString());
-                return null;
-            }
-
-            return QueryUtils.fetchEarthquakeData(strings[0]);
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Earthquake> earthquakes) {
-
-            if (earthquakes == null || earthquakes.size() == 0){
-                Log.e(LOG_TAG, "asyncTask returned empty array");
-                return;
-            }
-
-            Log.d(LOG_TAG, "the http request returned: " + earthquakes.size() + " earthquakes");
-            updateUI(earthquakes);
-
-        }
+    @Override
+    public Loader<ArrayList<Earthquake>> onCreateLoader(int id, Bundle args) {
+        return new QuakeAsyncLoader(this, QUERY_URL_STRING);
     }
+
+    @Override
+    public void onLoadFinished(Loader<ArrayList<Earthquake>> loader, ArrayList<Earthquake> data) {
+        updateUI(data);
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<ArrayList<Earthquake>> loader) {
+        loader.reset();
+
+    }
+
 
 }
